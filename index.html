@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <style>
+    html,body {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      height: 100%;
+      width: 100%;
+      
+    }
+    .demo {
+      margin: 0 auto;
+      max-width: 800px;
+      height: 100%;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+
+    @media (max-width: 525px) {
+      .demo {
+        flex-direction: column;
+      }
+    }
+
+    .flip-box {
+      width: 120px;
+      padding-top: 10px;
+      background-color: rgb(82, 82, 82);
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+      border-radius: 10px;
+    }
+
+    .bottom-value {
+      padding: 5px 0;
+      color: #fff;
+    }
+
+    .flip {
+      display: inline-block;
+      position: relative;
+      width: 100px;
+      height: 100px;
+      line-height: 100px;
+      border-radius: 10px;
+      background: #fff;
+      font-size: 66px;
+      color: rgb(250, 250, 250);
+      box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
+      text-align: center;
+      font-family: "Helvetica Neue";
+    }
+
+    .flip .digital > .before,
+    .flip .digital > .after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      background: rgb(80 158 91);
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+
+    .flip .digital > .before {
+      top: 0;
+      bottom: 50%;
+      border-radius: 10px 10px 0 0;
+      border-bottom: solid 1px #666;
+    }
+
+    .flip .digital > .after {
+      top: 50%;
+      bottom: 0;
+      border-radius: 0 0 10px 10px;
+      line-height: 0;
+    }
+
+    /*向下翻*/
+    .flip.down .front > .before {
+      z-index: 3;
+    }
+
+    .flip.down .back > .after {
+      z-index: 2;
+      transform-origin: 50% 0%;
+      transform: perspective(160px) rotateX(180deg);
+    }
+
+    .flip.down .front > .after,
+    .flip.down .back > .before {
+      z-index: 1;
+    }
+
+    .flip.down.go .front > .before {
+      transform-origin: 50% 100%;
+      animation: frontFlipDown 0.8s ease-in-out both;
+      box-shadow: 0 -2px 6px rgba(255, 255, 255, 0.3);
+      backface-visibility: hidden;
+    }
+
+    .flip.down.go .back > .after {
+      animation: backFlipDown 0.8s ease-in-out both;
+    }
+
+    @keyframes frontFlipDown {
+      0% {
+        transform: perspective(160px) rotateX(0deg);
+      }
+
+      100% {
+        transform: perspective(160px) rotateX(-180deg);
+      }
+    }
+
+    @keyframes backFlipDown {
+      0% {
+        transform: perspective(160px) rotateX(180deg);
+      }
+
+      100% {
+        transform: perspective(160px) rotateX(0deg);
+      }
+    }
+  </style>
+  <body>
+    <div class="demo">
+      <div id="day" class="flip-box">
+        <div class="flip down">
+          <!-- 當前值 -->
+          <div class="digital front">
+            <div class="before"></div>
+            <div class="after"></div>
+          </div>
+          <!-- 下一值 -->
+          <div class="digital back">
+            <div class="before"></div>
+            <div class="after"></div>
+          </div>
+        </div>
+        <div class="bottom-value">Days</div>
+      </div>
+      <div id="hour" class="flip-box">
+        <div class="flip down">
+          <!-- 當前值 -->
+          <div class="digital front">
+            <div class="before"></div>
+            <div class="after"></div>
+          </div>
+          <!-- 下一值 -->
+          <div class="digital back">
+            <div class="before"></div>
+            <div class="after"></div>
+          </div>
+        </div>
+        <div class="bottom-value">Hours</div>
+      </div>
+      <div id="minute" class="flip-box">
+        <div class="flip down">
+          <!-- 當前值 -->
+          <div class="digital front">
+            <div class="before"></div>
+            <div class="after"></div>
+          </div>
+          <!-- 下一值 -->
+          <div class="digital back">
+            <div class="before"></div>
+            <div class="after"></div>
+          </div>
+        </div>
+        <div class="bottom-value">Minutes</div>
+      </div>
+      <div id="second" class="flip-box">
+        <div class="flip down">
+          <!-- 當前值 -->
+          <div class="digital front">
+            <div class="before"></div>
+            <div class="after"></div>
+          </div>
+          <!-- 下一值 -->
+          <div class="digital back">
+            <div class="before"></div>
+            <div class="after"></div>
+          </div>
+        </div>
+        <div class="bottom-value">Seconds</div>
+      </div>
+    </div>
+    <script>
+      const seconds = document.getElementById("second");
+      const minutes = document.getElementById("minute");
+      const hours = document.getElementById("hour");
+      const days = document.getElementById("day");
+      let preValue;
+
+      // 執行翻轉動畫
+      function flipDown(comps, value) {
+        setBackValue(comps, value)
+        console.log(comps)
+        const flip = comps.querySelector('.flip')
+        flip.setAttribute("class", "flip down go");
+
+        // 復原狀態
+        setTimeout(function () {
+          setFrontValue(comps, value)
+          flip.setAttribute("class", "flip down");
+        }, 700);
+      }
+
+      // 計算三天之後的時間
+      function getTimeRemaining(endtime) {
+        const total = Date.parse(endtime) - Date.parse(new Date());
+        const seconds = Math.floor((total / 1000) % 60);
+        const minutes = Math.floor((total / 1000 / 60) % 60);
+        const hours = Math.floor((total / (1000 * 60 * 60)) % 24);
+        const days = Math.floor(total / (1000 * 60 * 60 * 24));
+
+        return {
+          total,
+          days,
+          hours,
+          minutes,
+          seconds,
+        };
+      }
+
+      function updateClock(endtime) {
+        const currentTime = getTimeRemaining(new Date(endtime));
+      
+        // 判斷前後有沒有差別
+        if(preValue?.days !== currentTime.days) {
+          flipDown(days, ("0" + currentTime.days).slice(-2));
+        }
+        if(preValue?.hours !== currentTime.hours) {
+          flipDown(hours, ("0" + currentTime.hours).slice(-2));
+        }
+        if(preValue?.minutes !== currentTime.minutes) {
+          flipDown(minutes, ("0" + currentTime.minutes).slice(-2));
+        }
+        if (preValue?.seconds !== currentTime.seconds) {
+          flipDown(seconds, ("0" + currentTime.seconds).slice(-2));
+        }
+
+        // 更新比對數值數值
+        preValue = currentTime
+      }
+
+      function setBackValue(comp, value) {
+        const back = comp.querySelector('.back')
+        back.querySelector('.before').innerHTML = value;
+        back.querySelector('.after').innerHTML = value;
+      }
+
+      function setFrontValue(comp, value) {
+        const front = comp.querySelector('.front')
+        front.querySelector('.before').innerHTML = value
+        front.querySelector('.after').innerHTML = value
+      }
+
+      function initClock(endtime) {
+        const currentTime = getTimeRemaining(new Date(endtime));
+        updateClock(endtime)
+        // 定時器開始
+        const timeinterval = setInterval(() => updateClock(endtime), 1000);
+        if (currentTime.total <= 0) {
+          clearInterval(timeinterval);
+        }
+      }
+
+      const deadline = Date.parse(new Date()) + 3 * 24 * 60 * 60 * 1000;
+      
+
+      window.onload = () => {
+        initClock(deadline);
+      }
+    </script>
+  </body>
+</html>
